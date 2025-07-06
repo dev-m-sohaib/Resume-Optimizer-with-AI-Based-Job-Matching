@@ -1,0 +1,163 @@
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #fff;
+}
+.resume-header h1 { 
+    margin: 0; 
+    font-size: 28px; 
+    color: #2c3e50;
+}
+.contact-info { 
+    font-size: 14px; 
+    color: #555; 
+}
+.section { 
+    margin-bottom: 30px; 
+}
+.section-title { 
+    font-size: 18px; 
+    font-weight: bold; 
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+.subsection { 
+    margin-bottom: 15px; 
+}
+.subsection-header { 
+    font-weight: bold; 
+    margin-bottom: 5px; 
+}
+.subsection-title { 
+    display: block; 
+    font-size: 16px; 
+    color: #3498db;
+}
+.subsection-details { 
+    font-size: 14px; 
+    color: #7f8c8d; 
+    font-style: italic;
+}
+.subsection-content { 
+    font-size: 15px; 
+    line-height: 1.6; 
+}
+
+@media screen {
+    body {
+        background-color: #f5f7fa;
+        padding: 20px 0;
+    }
+    .resume-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        padding: 40px;
+        position: relative;
+    }
+    .resume-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #ecf0f1;
+    }
+    .section-title {
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 5px;
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+    .btn {
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-primary {
+        background: #3498db;
+        color: white;
+        border: none;
+    }
+    .btn-primary:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+    }
+    .btn-secondary {
+        background: #2c3e50;
+        color: white;
+        border: none;
+    }
+    .btn-secondary:hover {
+        background: #1a252f;
+        transform: translateY(-2px);
+    }
+    .btn-cancel {
+        background: #e74c3c;
+        color: white;
+        border: none;
+    }
+    .btn-cancel:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+.version-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #3498db;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+}
+
+@media print {
+    body {
+        padding: 0;
+        background: white;
+        font-size: 12pt;
+    }
+    .resume-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 20px;
+        box-shadow: none;
+        border-radius: 0;
+    }
+.resume-header {
+        text-align: left;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    .section-title {
+        border-bottom: 1px solid #ddd;
+        font-size: 14pt;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .subsection-title {
+        font-size: 12pt;
+    }
+    .subsection-content {
+        font-size: 11pt;
+    }
+a {
+        text-decoration: none;
+        color: inherit;
+    }
+}

@@ -1,0 +1,25 @@
+
+.section-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+.section-content.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    margin-bottom: 0;
+    padding: 0;
+}
+.form-tip {
+    border-left: 4px solid #0d6efd;
+}
+.char-counter {
+    text-align: right;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+form {
+    animation: fadeIn 0.5s ease-out;
+}
