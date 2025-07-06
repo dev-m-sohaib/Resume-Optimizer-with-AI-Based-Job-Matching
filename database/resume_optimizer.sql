@@ -33,10 +33,10 @@ CREATE TABLE `optimizations` (
   `job_description` text NOT NULL,
   `optimized_summary` text DEFAULT NULL,
   `optimized_experience` text DEFAULT NULL,
-  `optimized_skills` text DEFAULT NULL,
   `old_summary` text DEFAULT NULL,
   `old_experience` text DEFAULT NULL,
-  `old_skills` text DEFAULT NULL,
+  `original_score` TINYINT,
+  `optimized_score` TINYINT,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

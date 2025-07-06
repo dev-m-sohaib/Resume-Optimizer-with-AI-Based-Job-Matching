@@ -14,8 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['error' => 'Resume not found']);
         exit;
     }
+
     $prompt = "I have a resume and a job description. Please suggest optimizations to better align the resume with the job description. 
-Only suggest changes to existing content - do not add any new experiences, or qualifications that aren't already in the resume.
+Only suggest changes to existing content - do not add any new experiences or qualifications that aren't already in the resume.
 
 Resume Summary:
 {$resume['summary']}
@@ -30,14 +31,23 @@ Please return your suggestions in JSON format with these fields:
 {
   \"optimized_summary\": {
     \"original\": \"[original summary text]\",
-    \"optimized\": \"[optimized summary text]\"
+    \"optimized\": \"[optimized summary text]\",
+    \"original_score\": [0-10],
+    \"optimized_score\": [0-10]
   },
   \"optimized_experience\": {
     \"original\": \"[original experience text]\",
-    \"optimized\": \"[optimized experience text]\"
+    \"optimized\": \"[optimized experience text]\",
+    \"original_score\": [0-10],
+    \"optimized_score\": [0-10]
+  },
+  \"overall_score\": {
+    \"original\": [0-10],
+    \"optimized\": [0-10]
   }
 }
 Focus on rewording to better match keywords and requirements from the job description, while maintaining truthfulness.";
+
     $data = [
         'contents' => [
             [
@@ -63,11 +73,11 @@ Focus on rewording to better match keywords and requirements from the job descri
         $optimizedData = json_decode(trim($cleanedResponse), true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
-            $responseData = [
-                'optimized_summary' => $optimizedData['optimized_summary'] ?? ['original' => '', 'optimized' => ''],
-                'optimized_experience' => $optimizedData['optimized_experience'] ?? ['original' => '', 'optimized' => ''] 
-            ];
-            echo json_encode($responseData);
+            echo json_encode([
+                'optimized_summary' => $optimizedData['optimized_summary'] ?? ['original' => '', 'optimized' => '', 'original_score' => 0, 'optimized_score' => 0],
+                'optimized_experience' => $optimizedData['optimized_experience'] ?? ['original' => '', 'optimized' => '', 'original_score' => 0, 'optimized_score' => 0],
+                'overall_score' => $optimizedData['overall_score'] ?? ['original' => 0, 'optimized' => 0]
+            ]);
         } else {
             echo json_encode([
                 'error' => 'Failed to parse AI response',

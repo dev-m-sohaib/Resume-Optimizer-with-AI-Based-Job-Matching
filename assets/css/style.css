@@ -63,3 +63,32 @@
     text-align: center;
     color: #95a5a6;
 } 
+.score-card {
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.score-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+.score-label {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+.progress {
+    height: 10px;
+    margin: 10px 0;
+}
+.score-diff {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+.positive {
+    color: #28a745;
+}
+.negative {
+    color: #dc3545;
+}

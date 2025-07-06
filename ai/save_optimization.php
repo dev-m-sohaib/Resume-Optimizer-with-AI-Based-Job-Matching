@@ -12,21 +12,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $job_description = sanitizeInput($_POST['job_description']);
     $optimized_summary = sanitizeInput($_POST['optimized_summary']);
     $optimized_experience = sanitizeInput($_POST['optimized_experience']); 
+    $optimized_score = sanitizeInput($_POST['optimized_score']); 
+    $original_score = sanitizeInput($_POST['original_score']); 
  try {
         $pdo->beginTransaction();
         $stmt = $pdo->prepare("SELECT summary, experience FROM resumes WHERE id = ? AND user_id = ?");
         $stmt->execute([$resume_id, $_SESSION['user_id']]);
         $resume_data = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$resume_data) {throw new Exception('Invalid resume');}
-        $stmt = $pdo->prepare("INSERT INTO optimizations (resume_id, job_description,old_summary, old_experience,optimized_summary, optimized_experience)
-            VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO optimizations (resume_id, job_description,old_summary, old_experience,optimized_summary, optimized_experience, optimized_score, original_score)
+            VALUES (?, ?, ?, ?, ?, ?, ?,?)");
         $insertSuccess = $stmt->execute([
             $resume_id,
             $job_description,
             $resume_data['summary'],           
             $resume_data['experience'],         
             $optimized_summary,                
-            $optimized_experience                
+            $optimized_experience,             
+            $optimized_score,               
+            $original_score                
         ]);
 
         if (!$insertSuccess) {throw new Exception('Failed to save optimization history');}
