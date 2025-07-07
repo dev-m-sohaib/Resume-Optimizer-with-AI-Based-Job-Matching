@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `optimizations` (
   `id` int(11) NOT NULL,
   `resume_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `job_description` text NOT NULL,
   `optimized_summary` text DEFAULT NULL,
   `optimized_experience` text DEFAULT NULL,

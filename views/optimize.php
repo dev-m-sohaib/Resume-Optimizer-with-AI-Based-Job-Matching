@@ -21,7 +21,7 @@ $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
 $view_optimization = null;
 
 if ($view_id) {
-    $stmt = $pdo->prepare("SELECT o.id AS optimization_id, o.resume_id, o.job_description, o.optimized_summary, o.optimized_experience, o.resume_id, r.title, o.old_summary, o.old_experience, o.original_score, o.optimized_score FROM optimizations o JOIN resumes r ON o.resume_id = r.id WHERE o.id = ? AND r.user_id = ?");
+    $stmt = $pdo->prepare("SELECT o.id AS optimization_id, o.resume_id, o.job_description, o.optimized_summary, o.optimized_experience, o.old_summary, o.old_experience, o.original_score, o.optimized_score, r.title FROM optimizations o JOIN resumes r ON o.resume_id = r.id WHERE o.id = ? AND r.user_id = ?");
     $stmt->execute([$view_id, $_SESSION['user_id']]);
     $result = $stmt->fetch();
     
@@ -32,9 +32,9 @@ if ($view_id) {
             'title' => $result['title'],
             'job_description' => $result['job_description'],
             'optimized_summary' => $result['optimized_summary'],
-            'optimized_experience' => $result['optimized_experience'],
+            'optimized_experience' => json_decode($result['optimized_experience'], true),
             'old_summary' => $result['old_summary'],
-            'old_experience' => $result['old_experience'],
+            'old_experience' => json_decode($result['old_experience'], true),
             'original_score' => $result['original_score'],
             'optimized_score' => $result['optimized_score']
         ];
@@ -51,6 +51,31 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: " . ($resume_id ? "optimize.php?resume_id=$resume_id" : "optimize.php"));
     exit;
 }
+
+function formatExperience($experiences) {
+    $output = '';
+    if (!is_array($experiences)) {
+        return 'No experience data available';
+    }
+    foreach ($experiences as $exp) {
+        if (!empty($exp['company'])) {
+            $output .= '<div class="experience-entry">';
+            $output .= '<h5>' . htmlspecialchars($exp['company']) . '</h5>';
+            $output .= '<p><strong>' . htmlspecialchars($exp['position']) . '</strong></p>';
+            $output .= '<p><em>' . htmlspecialchars($exp['start_date']) . ' - ' . ($exp['current'] ? 'Present' : ($exp['end_date'] ?? '')) . '</em></p>';
+            if (!empty($exp['description'])) {
+                $lines = array_filter(array_map('trim', explode("\n", $exp['description'])));
+                $output .= '<ul>';
+                foreach ($lines as $line) {
+                    $output .= '<li>' . htmlspecialchars($line) . '</li>';
+                }
+                $output .= '</ul>';
+            }
+            $output .= '</div>';
+        }
+    }
+    return $output ?: 'No experience data available';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,7 +85,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Optimize Resume - <?=APP_NAME?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
+</head>
 <body class="bg-light">
 <?php include('../includes/nav.php') ?>
 <div class="container py-4">
@@ -110,9 +135,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="optimize-form">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Selected: <?=htmlspecialchars($resume['title'])?></h2>
-                <?php if (isset($_GET['view']) || isset($_GET['resume_id']) || isset($_GET['optimize_id'])): ?>
-                    <a href="optimize.php" class="btn btn-secondary">Back to All Resumes</a>
-                <?php endif ?>
+                <a href="optimize.php" class="btn btn-secondary">Back to All Resumes</a>
             </div>
             
             <form id="optimizeForm" class="card mb-4">
@@ -121,10 +144,8 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-3">
                         <label for="job_description" class="form-label fw-bold">Paste Job Description</label>
                         <textarea id="job_description" name="job_description" rows="8" class="form-control" required placeholder="Copy and paste the job description you're applying for..."><?php if(isset($_GET['job_description'])) { echo trim($_GET['job_description']); } ?></textarea>
-
                         <small class="text-muted">The more detailed the job description, the better we can optimize your resume</small>
                     </div>
-                    
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary" id="optimizeBtn">Improve Resume</button>
                         <a href="optimize.php" class="btn btn-danger">Cancel</a>
@@ -148,7 +169,6 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="card score-card bg-light">
                             <div class="score-label">Original Match Score</div>
                             <div class="score-value" id="originalScore">0</div>
-                            
                             <div class="progress">
                                 <div id="scoreProgressOriginal" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
                             </div>
@@ -158,7 +178,6 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="card score-card bg-light">
                             <div class="score-label">Optimized Match Score <span id="scoreDiff" class="score-diff"></span></div>
                             <div class="score-value" id="optimizedScore">0</div>
-                            
                             <div class="progress">
                                 <div id="scoreProgressOptimized" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
                             </div>
@@ -177,7 +196,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="mb-4">
                                     <h4 class="h6 text-primary">Experience</h4>
-                                    <p id="originalExperience" class="mb-0"><?=nl2br(htmlspecialchars($resume['experience']))?></p>
+                                    <div id="originalExperience"><?=formatExperience(json_decode($resume['experience'] ?? '[]', true))?></div>
                                 </div>
                             </div>
                         </div>
@@ -193,7 +212,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="mb-4">
                                     <h4 class="h6 text-primary">Experience</h4>
-                                    <p id="optimizedExperience" class="mb-0"></p>
+                                    <div id="optimizedExperience"></div>
                                 </div>
                             </div>
                         </div>
@@ -206,12 +225,11 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             <h3 class="h5">Save Optimization</h3>
                             <p class="mb-4">Would you like to save these optimizations to your resume?</p>
                             <input type="hidden" name="resume_id" value="<?=$resume['id']?>">
-                            <input type="hidden" name="optimized_summary" value="">
-                            <input type="hidden" name="optimized_experience" value="">
+                            <input type="hidden" name="optimized_summary" id="optimized_summary_input">
+                            <input type="hidden" name="optimized_experience" id="optimized_experience_input">
                             <input type="hidden" name="original_score" id="original_score_input">
                             <input type="hidden" name="optimized_score" id="optimized_score_input">
                             <textarea name="job_description" style="display:none;"></textarea>
-                            
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-success">Save Changes</button>
                                 <button type="button" id="optimizeAgainBtn" class="btn btn-primary">Improve Again</button>
@@ -276,7 +294,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div class="mb-4">
                                 <h4 class="h6 text-primary">Experience</h4>
-                                <p class="mb-0"><?=nl2br(htmlspecialchars($view_optimization['old_experience']))?></p>
+                                <div><?=formatExperience($view_optimization['old_experience'])?></div>
                             </div>
                         </div>
                     </div>
@@ -295,7 +313,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div class="mb-4">
                                 <h4 class="h6 text-primary">Experience</h4>
-                                <p class="mb-0"><?=nl2br(htmlspecialchars($view_optimization['optimized_experience']))?></p>
+                                <div><?=formatExperience($view_optimization['optimized_experience'])?></div>
                             </div>
                         </div>
                     </div>
@@ -308,7 +326,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" class="btn btn-danger">Delete Optimization</button>
                 </form>
                 <div class="d-flex gap-2">
-                    <a href="optimize.php?resume_id=<?=$view_optimization['resume_id']?>&job_description=<?=$view_optimization['job_description']?>" class="btn btn-primary">Improve Again</a>
+                    <a href="optimize.php?resume_id=<?=$view_optimization['resume_id']?>&job_description=<?=urlencode($view_optimization['job_description'])?>" class="btn btn-primary">Improve Again</a>
                     <a href="dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
                 </div>
             </div>
@@ -320,8 +338,7 @@ if ($delete_id && $_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/js/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

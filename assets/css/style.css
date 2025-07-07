@@ -92,3 +92,7 @@
 .negative {
     color: #dc3545;
 }
+.experience-entry { margin-bottom: 15px; }
+        .experience-entry h5 { margin-bottom: 5px; }
+        .experience-entry p { margin-bottom: 5px; }
+        .experience-entry ul { padding-left: 20px; margin-bottom: 0; }

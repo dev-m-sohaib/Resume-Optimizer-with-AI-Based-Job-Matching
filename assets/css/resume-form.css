@@ -23,3 +23,31 @@
 form {
     animation: fadeIn 0.5s ease-out;
 }
+.entry-container {
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #0d6efd;
+}
+.entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.remove-entry {
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+.current-checkbox {
+    margin-left: 10px;
+}
+.date-fields {
+    display: flex;
+    gap: 15px;
+}
+.date-field {
+    flex: 1;
+}

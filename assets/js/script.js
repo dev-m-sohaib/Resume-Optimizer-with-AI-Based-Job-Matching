@@ -6,6 +6,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const optimizeAgainBtn = document.getElementById('optimizeAgainBtn');
     const saveForm = document.getElementById('saveOptimizationForm');
 
+    function formatExperience(experiences) {
+        let output = '';
+        if (Array.isArray(experiences)) {
+            experiences.forEach(exp => {
+                if (exp.company) {
+                    const description = exp.description ? exp.description.replace(/\s*\(Note:.*?\)/g, '') : '';
+                    output += '<div class="experience-entry">';
+                    output += '<h5>' + (exp.company || '') + '</h5>';
+                    output += '<p><strong>' + (exp.position || '') + '</strong></p>';
+                    output += '<p><em>' + (exp.start_date || '') + ' - ' + (exp.current ? 'Present' : (exp.end_date || '')) + '</em></p>';
+                    if (description) {
+                        const lines = description.split('\n').filter(line => line.trim());
+                        output += '<ul>';
+                        lines.forEach(line => {
+                            output += '<li>' + line + '</li>';
+                        });
+                        output += '</ul>';
+                    }
+                    output += '</div>';
+                }
+            });
+        }
+        return output || 'No experience data available';
+    }
+
     if (optimizeForm) {
         optimizeForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -24,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('Error: ' + data.error);
                     return;
                 }
-
+                console.log(data);
                 const optimizedSummary = document.getElementById('optimizedSummary');
                 const optimizedExperience = document.getElementById('optimizedExperience');
                 const originalScoreEl = document.getElementById('originalScore');
@@ -32,14 +57,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const scoreProgressOriginal = document.getElementById('scoreProgressOriginal');
                 const scoreProgressOptimized = document.getElementById('scoreProgressOptimized');
                 const scoreDiff = document.getElementById('scoreDiff');
-                const originalScoreText = document.getElementById("originalScore").textContent.trim();
-                const optimizedScoreText = document.getElementById("optimizedScore").textContent.trim();
-    
 
-                if (optimizedSummary) optimizedSummary.textContent = data.optimized_summary?.optimized || 'No optimization suggested';
-                if (optimizedExperience) optimizedExperience.textContent = data.optimized_experience?.optimized || 'No optimization suggested';
-                document.getElementById("original_score_input").value = originalScoreText;
-                document.getElementById("optimized_score_input").value = optimizedScoreText;
+                if (optimizedSummary) optimizedSummary.innerHTML = data.optimized_summary?.optimized || 'No optimization suggested';
+                if (optimizedExperience) {
+                    const cleanedExperience = (data.optimized_experience || []).map(exp => {
+                        const optimized = exp.optimized || exp;
+                        if (optimized.description) {
+                            optimized.description = optimized.description.replace(/\s*\(Note:.*?\)/g, '');
+                        }
+                        return optimized;
+                    });
+                    optimizedExperience.innerHTML = formatExperience(cleanedExperience);
+                }
                 if (data.overall_score) {
                     const originalScore = Math.round(data.overall_score.original * 10) / 10;
                     const optimizedScore = Math.round(data.overall_score.optimized * 10) / 10;
@@ -50,22 +79,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (scoreProgressOriginal) scoreProgressOriginal.style.width = `${originalScore * 10}%`;
                     if (scoreProgressOptimized) scoreProgressOptimized.style.width = `${optimizedScore * 10}%`;
                     if (scoreDiff) {
-                        scoreDiff.textContent = `+${scoreIncrease.toFixed(1)}`;
+                        scoreDiff.textContent = `${scoreIncrease >= 0 ? '+' : ''}${scoreIncrease.toFixed(1)}`;
                         scoreDiff.className = scoreIncrease >= 0 ? 'score-diff positive' : 'score-diff negative';
                     }
+
+                    document.getElementById('original_score_input').value = originalScore;
+                    document.getElementById('optimized_score_input').value = optimizedScore;
                 }
 
                 if (saveForm) {
-                    const setField = (name, value) => {
-                        const input = saveForm.querySelector(`[name="${name}"]`);
-                        if (input) input.value = value || '';
-                    };
-                    setField('resume_id', formData.get('resume_id'));
-                    setField('job_description', formData.get('job_description'));
-                    setField('optimized_summary', data.optimized_summary?.optimized);
-                    setField('optimized_experience', data.optimized_experience?.optimized);
-                    setField('original_score', data.overall_score?.original || 0);
-                    setField('optimized_score', data.overall_score?.optimized || 0);
+                    const cleanedExperience = (data.optimized_experience || []).map(exp => {
+                        const optimized = exp.optimized || exp;
+                        if (optimized.description) {
+                            optimized.description = optimized.description.replace(/\s*\(Note:.*?\)/g, '');
+                        }
+                        return optimized;
+                    });
+                    document.getElementById('optimized_summary_input').value = data.optimized_summary?.optimized || '';
+                    document.getElementById('optimized_experience_input').value = JSON.stringify(cleanedExperience);
+                    saveForm.querySelector('[name="resume_id"]').value = formData.get('resume_id');
+                    saveForm.querySelector('[name="job_description"]').value = formData.get('job_description');
                 }
 
                 if (resultsDiv) resultsDiv.style.display = 'block';

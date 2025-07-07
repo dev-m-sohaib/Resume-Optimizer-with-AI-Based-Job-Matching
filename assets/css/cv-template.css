@@ -161,3 +161,128 @@ a {
         color: inherit;
     }
 }
+.resume-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .resume-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .resume-header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .contact-info {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .subsection {
+            margin-bottom: 15px;
+        }
+
+        .subsection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        .subsection-details {
+            font-weight: normal;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
+        .subsection-content {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .subsection-content ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .no-print {
+            display: block;
+        }
+
+        .version-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #7f8c8d;
+            color: white;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            .resume-container {
+                margin: 0;
+                padding: 10px;
+                box-shadow: none;
+            }
+        }
