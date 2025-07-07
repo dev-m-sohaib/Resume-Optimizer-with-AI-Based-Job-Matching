@@ -17,8 +17,6 @@
         font-weight: 500;
     } 
 </style>
-
-<!-- Responsive Bootstrap Navbar -->
 <nav class="navbar navbar-expand-lg p-3">
     <div class="container-fluid">
         <h2 class="navbar-brand"><?php echo APP_NAME; ?></h2>
